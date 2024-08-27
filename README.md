@@ -13,6 +13,8 @@
         <sup>*</sup>Equal Contributions
         <sup>†</sup>Corresponding Author
     </p>
+    <a href='https://arxiv.org/pdf/2408.13742'><img src='https://img.shields.io/badge/arXiv-MIND-red' alt='arxiv'></a>
+
 </div>
 
 <div align="center">
@@ -34,8 +36,12 @@
 
 
 ## Todo List
-- [ ] First release 08/27/2024
+- [x] First release 08/27/2024
 - [ ] Release closed-loop simulation for Argoverse 2
 
 
+## Acknowledgment
+We would like to express sincere thanks to the authors of the following packages and tools:
+- [SIMPL](https://github.com/HKUST-Aerial-Robotics/SIMPL)
+- [ILQR](https://github.com/anassinator/ilqr)
 
