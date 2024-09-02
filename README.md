@@ -14,7 +14,7 @@
         <sup>†</sup>Corresponding Author
     </p>
     <a href='https://arxiv.org/pdf/2408.13742'><img src='https://img.shields.io/badge/arXiv-MIND-red' alt='arxiv'></a>
-
+    <a href='https://www.youtube.com/watch?v=Bwlb5Dz2OZQ'><img src='https://img.shields.io/badge/Video-MIND-blue' alt='youtube'></a>
 </div>
 
 <div align="center">
