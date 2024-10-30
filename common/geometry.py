@@ -1,5 +1,20 @@
 import numpy as np
 
+def is_inside_ellipse(point, mean, cov):
+    left_hand = (point - mean).T @ np.linalg.inv(cov) @ (point - mean)
+    return left_hand <= 5.991
+
+
+def ellipse_points(mean, cov, n=20):
+    vals, vecs = np.linalg.eigh(cov)
+    theta = np.linspace(0, 2 * np.pi, n)
+    a, b = np.sqrt(np.abs(vals) * 5.991)
+    ellipse_pts = np.array([a * np.cos(theta), b * np.sin(theta)])
+    ellipse_pts_rotated = vecs @ ellipse_pts
+    ellipse_pts_rotated[0, :] += mean[0]
+    ellipse_pts_rotated[1, :] += mean[1]
+    return ellipse_pts_rotated.T
+
 
 def get_mahalanobis_distances(points, mean, covariance):
     vectors = points - mean
@@ -13,6 +28,43 @@ def get_point_mean_distances(points, mean):
     vectors = points - mean
     distances = np.sqrt(np.sum(vectors * vectors, axis=1))
     return distances
+
+
+def remove_close_points(points, min_dist):
+    if len(points) < 2:
+        return points
+
+    filtered_points = [points[0]]
+    for i in range(1, len(points)):
+        if np.linalg.norm(points[i] - filtered_points[-1]) > min_dist:
+            filtered_points.append(points[i])
+    return np.array(filtered_points)
+
+
+# Vertices of a cube
+def get_cube_vertices(x, y, z, dx, dy, dz):
+    return [
+        [x, y, z], [x + dx, y, z], [x + dx, y + dy, z], [x, y + dy, z],
+        [x, y, z + dz], [x + dx, y, z + dz], [x + dx, y + dy, z + dz], [x, y + dy, z + dz]
+    ]
+
+
+def rotate_vertex(vertex, radians):
+    x, y, z = vertex
+    x_prime = x * np.cos(radians) - y * np.sin(radians)
+    y_prime = x * np.sin(radians) + y * np.cos(radians)
+    return [x_prime, y_prime, z]
+
+
+def get_vehicle_vertices(x, y, z, yaw, length, width, height):
+    # get the left-bottom of axis-aligned bounding box of the vehicle
+    x_lb = - length / 2
+    y_lb = - width / 2
+    axis_aligned_vertices = get_cube_vertices(x_lb, y_lb, z, length, width, height)
+    # rotate the vertices
+    rotated_vertices = [rotate_vertex(v, yaw) for v in axis_aligned_vertices]
+    # translate the vertices to the center of the vehicle
+    return [[v[0] + x, v[1] + y, v[2]] for v in rotated_vertices]
 
 
 def get_point_line_distance(points, line_start, line_end):
@@ -55,7 +107,5 @@ def project_point_on_polyline(point, polyline):
     heading = np.arctan2(dy[nearest_index], dx[nearest_index])
 
     return proj_pt, heading, cum_distance
-
-
 
 

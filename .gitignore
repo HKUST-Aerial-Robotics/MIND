@@ -1,0 +1,13 @@
+*.pyc
+*.log
+.project
+.pydevproject
+*.png
+*.svg
+*.dot
+*/__pycache_
+*.jpg
+*.bin
+*.pcd
+.idea
+/outputs

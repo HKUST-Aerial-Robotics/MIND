@@ -31,7 +31,6 @@ class MINDPlanner:
         self.init_network()
         self.init_scen_tree_gen()
         self.init_traj_tree_opt()
-        print("[MINDPlanner] Initialized.")
 
     def init_device(self):
         if self.planner_cfg['use_cuda'] and torch.cuda.is_available():
@@ -116,12 +115,10 @@ class MINDPlanner:
         if len(scen_trees) < 0:
             return False, None, None
 
-        print("scenario expand done in {} secs".format(time.time() - t0))
         traj_trees = []
         debug_info = []
         for scen_tree in scen_trees:
             traj_tree, debug = self.get_traj_tree(scen_tree, lcl_smp)
-            # traj_trees.append(self.get_traj_tree(scen_tree, lcl_smp))
             traj_trees.append(traj_tree)
             debug_info.append(debug)
 
@@ -131,32 +128,6 @@ class MINDPlanner:
         # traj_trees = Parallel(n_jobs=n_proc)(
         #     delayed(self.get_traj_tree)(scen_tree, lcl_smp) for scen_tree in scen_trees)
 
-        print("mind planning done in {} secs".format(time.time() - t0))
-
-        # import matplotlib.pyplot as plt
-        # for idx, (traj_tree, scen_tree) in enumerate(zip(traj_trees, scen_trees)):
-        #     _, ax = plt.subplots(figsize=(12, 12))
-        #     ax.axis('equal')
-        #     debug_info[idx].plot(ax)
-        #     ax.plot(lcl_smp.ego_agent.state[0], lcl_smp.ego_agent.state[1], 'b*')
-        #
-        #     l_node = scen_tree.get_leaf_nodes()[0]
-        #     tgt_pts = l_node.data[-1]
-        #
-        #     # ax.plot(lcl_smp.target_lane[:, 0], lcl_smp.target_lane[:, 1], 'r-', marker='o')
-        #     ax.plot(tgt_pts[:, 0], tgt_pts[:, 1], 'r-', marker='o')
-        #     for node in traj_tree.nodes.values():
-        #         node_ctr = node.data[0][:2]
-        #         ax.plot(node_ctr[0], node_ctr[1], marker='o', alpha=0.5, color='g')
-        #         ax.text(node_ctr[0], node_ctr[1], str(node.key) + "_v:{:.2}".format(node.data[0][2]) +
-        #                 "_q:{:.2}".format(node.data[0][3]) + "_a:{:.2}".format(node.data[0][4]) +
-        #                 "_theta:{:.2}".format(node.data[0][4]) +
-        #                 "_da:{:.2}".format(node.data[1][0]) + "_dtheta:{:.2}".format(node.data[1][1]), fontsize=8)
-        #         if node.parent_key is not None:
-        #             parent_node = traj_tree.get_node(node.parent_key)
-        #             pts = np.array([parent_node.data[0][:2], node.data[0][:2]])
-        #             ax.plot(pts[:, 0], pts[:, 1], color='g', alpha=0.25)
-        #     plt.show()
 
         # select the best trajectory
         best_traj_idx = None
@@ -204,7 +175,6 @@ class MINDPlanner:
         self.traj_tree_opt.init_warm_start_cost_tree(scen_tree, self.state, self.ctrl, self.gt_tgt_lane, lcl_smp.target_velocity)
         xs, us = self.traj_tree_opt.warm_start_solve()
         self.traj_tree_opt.init_cost_tree(scen_tree, self.state, self.ctrl, self.gt_tgt_lane, lcl_smp.target_velocity)
-        # return self.traj_tree_opt.solve(us)
         return self.traj_tree_opt.solve(us), self.traj_tree_opt.debug
 
     def evaluate_traj_tree(self, lcl_smp, traj_tree):
@@ -225,9 +195,6 @@ class MINDPlanner:
             comfort_cost += comfort_str_weight * ctrl[1] ** 2
             efficiency_cost += efficiency_weight * (lcl_smp.target_velocity - state[2]) ** 2
             target_cost += target_weight * self.get_dist_to_target_lane(lcl_smp, state)
-        print(
-            "n_nodes: {}, comfort cost: {}, efficiency cost: {}, target cost: {}".format(n_nodes, comfort_cost,
-                                                                                         efficiency_cost, target_cost))
         return (comfort_cost + efficiency_cost + target_cost) / n_nodes
 
     def get_dist_to_target_lane(self, lcl_smp, state):

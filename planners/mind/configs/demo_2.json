@@ -1,0 +1,6 @@
+{
+    "use_cuda": true,
+    "network_config": "planners.mind.configs.networks.net_cfg",
+    "ckpt_path": "planners/mind/check_points/20240121-172745.tar",
+    "planning_config": "planners.mind.configs.planning.demo_2"
+}

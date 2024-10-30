@@ -36,8 +36,6 @@ class iLQR:
         self.cost = None
         self.N = None
         self._use_hessians = hessians and dynamics.has_hessians
-        if hessians and not dynamics.has_hessians:
-            warnings.warn("hessians requested but are unavailable in dynamics")
 
         # Regularization terms: Levenberg-Marquardt parameter.
         # See II F. Regularization Schedule.
@@ -149,15 +147,14 @@ class iLQR:
             except np.linalg.LinAlgError as e:
                 # Quu was not positive-definite and this diverged.
                 # Try again with a higher regularization term.
-                warnings.warn(str(e))
+                # warnings.warn(str(e))
+                continue
 
             if not accepted:
                 # Increase regularization term.
-                warnings.warn("increasing regularization term")
                 self._delta = max(1.0, self._delta) * self._delta_0
                 self._mu = max(self._mu_min, self._mu * self._delta)
                 if self._mu_max and self._mu >= self._mu_max:
-                    warnings.warn("exceeded max regularization term")
                     break
 
 
@@ -200,7 +197,6 @@ class iLQR:
                 if self._mu <= self._mu_min:
                     self._mu = 0.0
                 return accepted, converged
-        warnings.warn("Line search failed")
         return accepted, converged
 
     def _line_search(self, alpha=1.0):

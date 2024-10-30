@@ -2,7 +2,7 @@
 # Please check LICENSE for more detail
 
 import torch.nn as nn
-from fractions import gcd
+from math import gcd
 
 
 # Conv layer with norm (gn or bn) and relu.

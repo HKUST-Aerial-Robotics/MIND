@@ -375,8 +375,9 @@ class SceneDecoder(nn.Module):
         )
 
         # several layers of transformer encoder
-        enc_layer = TransformerEncoderLayer(d_model=self.hidden_size, nhead=4, dim_feedforward=self.hidden_size * 12)
-        self.ctx_sat = TransformerEncoder(enc_layer, num_layers=2)
+        enc_layer = TransformerEncoderLayer(d_model=self.hidden_size,
+                                            nhead=4, dim_feedforward=self.hidden_size * 12)
+        self.ctx_sat = TransformerEncoder(enc_layer, num_layers=2, enable_nested_tensor=False)
 
         # linear projection for rpe embedding rpe_dim = 11
         self.proj_rpe = nn.Sequential(
